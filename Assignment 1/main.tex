@@ -1,0 +1,37 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Assignment 1 | FPGA Lab}
+\author{Akhil Kumar Donka}
+\date{January 2022}
+
+\begin{document}
+
+\maketitle
+
+\section{Question}
+Write the Product of Sum form of function G(U,V,W) for the following truth table representation of F
+
+    \begin{table} [h!]
+    \centering
+    \begin{tabular}{ | c | c | c | c | }
+    \hline
+    U & V & W & G \\ [0.5ex]
+     \hline
+    0 & 0 & 0 & 1 \\
+    0 & 0 & 1 & 0 \\
+    0 & 1 & 0 & 1 \\
+    0 & 1 & 1 & 0 \\
+    1 & 0 & 0 & 1 \\
+    1 & 0 & 1 & 0 \\
+    1 & 1 & 0 & 0 \\
+    1 & 1 & 1 & 1 \\ [1ex]
+    \hline
+    \end{tabular}
+    \end{table}
+
+\section{Solution}
+
+POS Expression : G = $(U + V + \bar{W})$.($U+\bar{V}+\bar{W}$). ($\bar{U}+V+\bar{W}$).($\bar{U}+\bar{V}+W)$
+
+\end{document}
