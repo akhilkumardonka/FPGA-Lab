@@ -1,15 +1,18 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{karnaugh-map}
+\usepackage{tikz}
 
 \title{Assignment 1 | FPGA Lab}
 \author{Akhil Kumar Donka}
 \date{January 2022}
 
 \begin{document}
-
 \maketitle
 
 \section{Question}
+
 Write the Product of Sum form of function G(U,V,W) for the following truth table representation of F
 
     \begin{table} [h!]
@@ -32,6 +35,30 @@ Write the Product of Sum form of function G(U,V,W) for the following truth table
 
 \section{Solution}
 
-POS Expression : G = $(U + V + \bar{W})$.($U+\bar{V}+\bar{W}$). ($\bar{U}+V+\bar{W}$).($\bar{U}+\bar{V}+W)$
+\subsection{KMAP Implementation}
+Given truth table can be minimized using a KMap (Figure 1). Using implicants in figure, POS Terms obtained are : $(U + \bar{W}),(V + \bar{W}),(\bar{U} + \bar{V} + W)$
+
+\begin{figure}[!ht]
+\centering
+\resizebox{\columnwidth}{!}
+{
+\begin{karnaugh-map}[4][2][1][][]
+    \minterms{0,2,4,7}
+    \maxterms{1,3,5,6}
+    \implicant{1}{3}
+    \implicant{1}{5}
+    \implicant{6}{6}
+    \draw[color=black, ultra thin] (0,2) --
+    node [pos=0.7, above right, anchor=south west] {$VW$} % YOU CAN CHANGE NAME OF VAR HERE, THE $X$ IS USED FOR ITALICS
+    node [pos=0.7, below left, anchor=north east] {$U$} % SAME FOR THIS
+    ++(135:1);
+    \end{karnaugh-map}
+}
+\caption{POS for G}
+\label{fig:kmap_G_pos}
+\end{figure}
+
+\subsection{Minimized POS Expression}
+G = $(U + \bar{W}).(V + \bar{W}).(\bar{U} + \bar{V} + W)$
 
 \end{document}
