@@ -1,6 +1,0 @@
-#Install imagemagick
-pacman -S imagemagick
-
-#Install pdftk
-
-yay -S pdftk
