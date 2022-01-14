@@ -2,7 +2,18 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{karnaugh-map}
-\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{placeins}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{multicol}
+\usepackage{amssymb}
+\usepackage[framed]{matlab-prettifier}
+\usepackage{graphicx}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{enumerate}
+\usepackage{circuitikz}
 
 \title{Assignment 1 | FPGA Lab}
 \author{Akhil Kumar Donka}
@@ -36,9 +47,9 @@ Write the Product of Sum form of function G(U,V,W) for the following truth table
 \section{Solution}
 
 \subsection{KMAP Implementation}
-Given truth table can be minimized using a KMap (Figure 1). Using implicants in figure, POS Terms obtained are : $(U + \bar{W}),(V + \bar{W}),(\bar{U} + \bar{V} + W)$
+Given truth table can be minimized using a KMap (Figure 1). Using implicants in figure, POS Terms obtained are : $(U + \overline{W}),(V + \overline{W}),(\overline{U} + \overline{V} + W)$
 
-\begin{figure}[!ht]
+\begin{figure}[!htbp]
 \centering
 \resizebox{\columnwidth}{!}
 {
@@ -57,8 +68,55 @@ Given truth table can be minimized using a KMap (Figure 1). Using implicants in 
 \caption{POS for G}
 \label{fig:kmap_G_pos}
 \end{figure}
+\FloatBarrier
 
 \subsection{Minimized POS Expression}
-G = $(U + \bar{W}).(V + \bar{W}).(\bar{U} + \bar{V} + W)$
+G = $(U + \overline{W}).(V + \overline{W}).(\overline{U} + \overline{V} + W)$
+
+\subsection{NAND Logic Implementation}
+
+To implement it using NAND Logic, we first convert it into SOP form, which gives :
+
+\begin{center}
+   $\overline{V}.\overline{W} + \overline{U}.\overline{W} + U.V.W$\\
+   \vspace{5pt}
+   $(\overline{V} + \overline{U}).\overline{W} + U.V.W$\\
+   \vspace{5pt}
+   $\overline{V.U}.\overline{W} + U.V.W$\\
+\end{center}
+The last expression can be implemented using only NAND Gates.
+
+\begin{center}
+\begin{circuitikz}
+\draw
+(0,0)node[nand port](mynand1){}
+
+(0,2)node[nand port](mynand3){}
+
+(2,2)node[nand port](mynand4){}
+
+(2,0)node[nand port](mynand5){}
+
+(4,0)node[nand port](mynand6){}
+
+(6,1)node[nand port](mynand7){}
+
+(mynand3.out)|-(mynand4.in 1)
+(mynand1.out)|-(mynand4.in 2)
+(mynand4.out)|-(mynand7.in 1)
+(mynand6.out)|-(mynand7.in 2)
+(mynand5.out)|-(mynand6.in 1)
+(mynand1.out)|-(mynand5.in 1)
+(mynand1.out)|-(mynand5.in 2)
+(mynand3.in 1)|-(mynand3.in 2)
+
+(mynand1.in 1) node (A1)     [anchor=east]           {U}
+(mynand1.in 2) node (A2)     [anchor=east]           {V}
+(mynand6.in 2) node (A3)     [anchor=east]           {W}
+(mynand7.out) node (A4)     [anchor=east, xshift=0.5cm]           {G}
+(mynand3.in 2) node (B1)     [anchor=east]  {W};
+
+\end{circuitikz}
+\end{center}
 
 \end{document}

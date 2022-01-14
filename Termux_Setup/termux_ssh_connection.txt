@@ -9,3 +9,4 @@ nmap localhost //to start ssh at specific port
 ================ on Laptop/PC cmd ===========
 
 ssh <username>@<ipaddress> -p <port>
+proot-distro login ubuntu
