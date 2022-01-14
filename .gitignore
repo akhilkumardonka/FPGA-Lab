@@ -1,2 +1,4 @@
 .vscode
 *.exe
+README.md
+.ipynb_checkpoints
