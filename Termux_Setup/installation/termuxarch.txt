@@ -1,0 +1,88 @@
+#Installing archlinux on termux, aka termuxarch
+
+#Get termuxarch 
+apt update
+wget https://raw.githubusercontent.com/sdrausty/TermuxArch/master/setupTermuxArch.sh
+bash setupTermuxArch.sh
+
+
+
+#locale
+#Incase of locale warnings, like
+bash: warning: setlocale: LC_COLLATE: cannot change locale (en_IN.UTF-8)
+bash: warning: setlocale: LC_CTYPE: cannot change locale (en_IN.UTF-8)
+bash: warning: setlocale: LC_MESSAGES: cannot change locale (en_IN.UTF-8)
+bash: warning: setlocale: LC_NUMERIC: cannot change locale (en_IN.UTF-8)
+bash: warning: setlocale: LC_TIME: cannot change locale (en_IN.UTF-8)
+
+nano /etc/locale.gen
+
+#Uncomment the line 
+en_IN.UTF-8...
+
+#and run 
+locale-gen
+
+#logout and login 
+
+#Starting archlinux on termux
+cd ~
+startarch
+or
+bash arch/startarch 
+
+#Essential packages
+pacman -Syu
+#pacman -Sy go base-devel tigervnc lxde wget git geany python-pip ttf-dejavu  chromium \
+#geany gnumeric clang bison flex svn make cmake 
+
+pacman -Sy go base-devel  wget git  python-pip \
+gnumeric clang bison flex svn make cmake neovim
+
+
+#Exit
+#Login as user
+bash arch/startarch ul user
+#or
+startarch l user
+makeyay
+
+# Installs code-server from the AUR using yay.
+yay -S code-server
+#sudo systemctl enable --now code-server@$USER
+# Now visit http://127.0.0.1:8080. Your password is in ~/.config/code-server/config.yaml
+export PASSWORD="password"
+code-server
+
+#Install texlive
+pacman -Sy texlive-most
+
+#Install python
+pacman -Sy python-numpy python-scipy python-matplotlib python-mpmath python-sympy python-cvxopt python-wheel
+pip install cvxpy
+
+#Install imagemagick
+pacman -Sy imagemagick
+
+
+
+
+#Exit 
+#Do this only if required - Create user on termuxarch 
+startarch
+addauser user
+#if the above command doesn't work
+startarch c addauser user
+#If the above doesn't work
+startarch
+useradd -m  username
+exit
+#To login as user
+startarch l username
+
+
+
+#End archlinux install
+
+
+
