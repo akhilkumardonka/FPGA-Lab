@@ -7,7 +7,7 @@ unsigned char Out;                         	//outputs
 char buffer[40];
 
 void disp_num(unsigned char A, unsigned char B, unsigned char C, unsigned char D){
-
+  A = 0;
   unsigned char a,b,c,d,e,f,g;
   a = ~( ((A)&(~B)&(~C)) | ((~A)&(B)&(D)) | ((A)&(~D)) | ((~A)&(C)) | ((B)&(C)) | ((~B)&(~D)) );
   b = ~( ((~A)&(~C)&(~D)) | ((~A)&(C)&(D)) | ((A)&(~C)&(D)) | ((~B)&(~C)) | ((~B)&(~D)) );
