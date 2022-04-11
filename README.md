@@ -9,3 +9,5 @@ Repo for EE5811 (FPGA Lab) Course | IIT Hyderabad
 3. Assembly level coding for minimized POS expression generted in previous assignments
 
 4. C coding and hex file generation using AVR-GCC
+
+5. Vaman (Pygmy) FPGA flashing | Verilog code for assignment 1 and qork-sdk binary file generation
