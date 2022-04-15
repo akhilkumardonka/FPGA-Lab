@@ -10,4 +10,10 @@ Repo for EE5811 (FPGA Lab) Course | IIT Hyderabad
 
 4. C coding and hex file generation using AVR-GCC
 
+<<<<<<< HEAD
+5. Verilog coding and flashing on Pygmy Board (Vaman FPGA)
+
+6. Embedded C Coding and flashing on Pygmy Board (ARM M4)
+=======
 5. Vaman (Pygmy) FPGA flashing | Verilog code for assignment 1 and qork-sdk binary file generation
+>>>>>>> 021e155d73f43f0228a12de9b4aa23d966ff782b
