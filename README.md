@@ -13,3 +13,5 @@ Repo for EE5811 (FPGA Lab) Course | IIT Hyderabad
 5. Verilog coding and flashing on Pygmy Board (Vaman FPGA)
 
 6. Embedded C Coding and flashing on Pygmy Board (ARM M4)
+
+7. VAMAN based Project | Arm to LCD, FPGA to LCD, ESP Logic Transmission

@@ -1,0 +1,165 @@
+Example
+#include <reg51.h>
+#include <intrins.h>
+
+sbit rs=0xa0; /*RS 21 for P2.0 LCD*/
+sbit rw=0xa1; /*P2.1 LCD-like R / W 22 */
+sbit en=0xa4; /*P2.4 E 25 for LCD*/
+sfr lcdbus=0x80; /*p0LCD data D0=P0.0*/
+unsigned int sys10mscounter;
+unsigned char syslimitcounter;
+char path1[8]={0x00,0x1f,0x00,0x1f,0x00,0x1f,0x00,0x1f};/*Custom symbol horizontal 1*/
+char path2[8]={0x1f,0x00,0x1f,0x00,0x1f,0x00,0x1f,0x00};/*Custom symbol horizontal 2*/
+char pats1[8]={0x15,0x15,0x15,0x15,0x15,0x15,0x15,0x15};/*Custom symbol vertical 1*/
+char pats2[8]={0x0a,0x0a,0x0a,0x0a,0x0a,0x0a,0x0a,0x0a};/*Custom symbol vertical 2*/
+void soft_nop(){}
+void soft_10ms()/************12MHZ provides 10MS software delay ************/
+{   register int i;
+    for(i=0;i<711;i++);
+}
+void soft_20ms()/************12MHZ provides 20MS software delay ************/
+{   soft_10ms();
+    soft_10ms();
+}
+void hard_10ms(unsigned int delaytime) /*Based on 10MS hardware delay*/
+{   sys10mscounter=delaytime;
+    while(sys10mscounter);
+}
+unsigned char lcdcounter;
+bit lcdusing1,lcdusing2;
+bit lcd_checkbusy()/*Check if LCD is busy*/
+{   register lcdstate;
+    rs=0; /*rs=1 is data,=0 is command.*/
+    rw=1; /*rw=1 for read,=0 for write.*/
+    en=1; /*en=1strobe.*/
+    soft_nop();
+    lcdstate=lcdbus;
+    en=0;
+    return((bit)(lcdstate&0x80));
+}
+void lcd_wrcmd(unsigned char lcdcmd) /*Write LCD command*/
+{   lcdusing1=1;
+    while(lcd_checkbusy());
+    lcdbus=lcdcmd;
+    rs=0; /*rs=1 is data,=0 is command.*/
+    rw=0; /*rw=1 for read,=0 for write.*/
+    en=1; /*en=1strobe.*/
+    soft_nop();
+    en=0;
+    lcdbus=0xff;
+    lcdusing1=0;
+}
+void lcd_moveto(char position) /*Move the cursor to the specified position.0-79*/
+{   register cmd=0x80;
+    lcdcounter=position;
+    if (position > 59)
+        position += 0x18;
+    else
+    {   if (position > 39)
+            position -= 0x14;
+        else
+        { if (position > 19)
+            position += 0x2c;
+        }
+    }
+    cmd=cmd|position;
+    lcd_wrcmd(cmd); 
+} 
+void lcd_wrdata(char lcddata) /* Display data at the current display position */ 
+{   char i;
+    lcdusing2=1;
+    while(lcd_checkbusy());
+    if(lcdcounter==20){
+        lcd_moveto(20);
+        while(lcd_checkbusy());
+    }
+    if(lcdcounter==40){
+        lcd_moveto(40);
+        while(lcd_checkbusy());
+    }
+    if(lcdcounter==60){
+        lcd_moveto(60);
+        while(lcd_checkbusy());
+    }
+    if(lcdcounter==80){
+        lcd_moveto(0);
+        while(lcd_checkbusy());
+        lcdcounter=0;
+    } /* for general purpose */
+    lcdcounter++;
+    lcdbus=lcddata;
+    rs=1; /*rs=1 is data,=0 is command.*/
+    rw=0; /*rw=1 for read,=0 for write.*/
+    en=1; /*en=1strobe.*/
+    soft_nop();
+    en=0;
+    lcdbus=0xff;
+    lcdusing2=0; 
+}
+
+void lcd_string(char *strpoint) /*Display the LCD string at the current display position*/
+{   register i=0;
+    while(strpoint[i]!=0){
+        lcd_wrdata(strpoint[i]);
+        i++;
+    }
+} 
+
+void lcd_init()/*initialization*/
+{   lcd_wrcmd(0x38); /* set 8 bit format, 2 lines, 5*7*/
+    lcd_wrcmd(0x0c); /*Overall display, close the cursor, do not blink*/
+    lcd_wrcmd(0x06); /* Set the input method, the increment does not shift */
+    lcd_wrcmd(0x01); /* clear the display */
+    lcdcounter=0;
+}
+void lcd_cls()/* clear the display */{ 
+    lcd_wrcmd(0x01);
+    lcdcounter=0; } void timer0(void) interrupt 1 /*T0 interrupt*/{ TH0=0xd8; /*12M,10ms*/
+    TL0=0xf6;
+    TR0=1;
+    if(sys10mscounter!=0)sys10mscounter--; /*Timer 10ms*/
+    if(syslimitcounter!=0)syslimitcounter--; /*Timer 10ms*/
+}
+
+main()
+{
+    unsigned char j;
+    IE=0;P0=0xff;P1=0xff;P2=0xff;P3=0xff; /*Initialize T*/
+    lcd_init();
+    soft_20ms();
+    TMOD=0x51;
+    TH0=0xd8; /*12M,10ms*/
+    TL0=0xf6;
+    TR0=1;ET0=1;EA=1;
+    while(1)
+    {
+        /*All black horizontal one horizontal two vertical one vertical two U Q ABCD... */
+        lcd_init(); /*full black*/
+        for(j=0;j<80;j++){lcd_wrdata(0xff);}
+        hard_10ms(50);
+        lcd_init(); /*Horizontal one can refer to self-designed symbols*/
+        lcd_wrcmd(0x40);
+        for(j=0;j<8;j++)lcd_wrdata(path1[j]);
+        for(j=0;j<100;j++)lcd_wrdata(0);
+        hard_10ms(50);
+        lcd_init(); /* Horizontal two */
+        lcd_wrcmd(0x40);
+        for(j=0;j<8;j++)lcd_wrdata(path2[j]);
+        for(j=0;j<100;j++)lcd_wrdata(0);
+        hard_10ms(50);
+        lcd_init(); /* Vertical one */
+        lcd_wrcmd(0x40);
+        for(j=0;j<8;j++)lcd_wrdata(pats1[j]);
+        for(j=0;j<100;j++)lcd_wrdata(0);
+        hard_10ms(50);
+        lcd_init(); /*Vertical two*/
+        lcd_wrcmd(0x40);
+        for(j=0;j<8;j++)lcd_wrdata(pats2[j]);
+        for(j=0;j<100;j++)lcd_wrdata(0);
+        hard_10ms(50);
+        lcd_init();
+        lcd_string("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU"); hard_10ms(50); lcd_init();
+        lcd_string("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ"); hard_10ms(50); lcd_init();
+        lcd_string("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz0123456789+-!#$&?"); hard_10ms(50);
+    }
+}
